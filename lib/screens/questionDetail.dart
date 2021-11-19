@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:learnquestions/data/dbHelper.dart';
-import 'package:learnquestions/models/question.dart';
+import 'package:sorularlaogren/data/dbHelper.dart';
+import 'package:sorularlaogren/models/question.dart';
 
 class QuestionDetail extends StatefulWidget{
   Question question;
@@ -39,14 +39,14 @@ class _QuestionDetail extends State {
     // TODO: implement build
     return Scaffold(
         appBar: AppBar(
-          title: Text("Question Detail"),
+          title: Text("Detaylar"),
           actions: <Widget>[
             PopupMenuButton<Options>(
                 onSelected: selectProcess,
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<Options>>[
                   PopupMenuItem<Options>(
                     value: Options.delete,
-                    child: Text("Delete"),
+                    child: Text("Sil"),
                   ),
                 ])
           ],
@@ -62,7 +62,7 @@ class _QuestionDetail extends State {
                 buildTextB(),
                 buildTextC(),
                 buildTextD(),
-                buildAnswer(),
+                buildAnswerDropDown(),
                 buildSaveButton()
               ],
               ),
@@ -84,49 +84,68 @@ class _QuestionDetail extends State {
 
   Widget buildTextQuestion() {
     return TextField(
-      decoration: InputDecoration(labelText: "Write question"),
+      decoration: InputDecoration(labelText: "Soru"),
       controller: txtQuestion,
     );
   }
 
   Widget buildTextA() {
     return TextField(
-      decoration: InputDecoration(labelText: "Write A option"),
+      decoration: InputDecoration(labelText: "A şıkkı"),
       controller: txtA,
     );
   }
 
   Widget buildTextB() {
     return TextField(
-      decoration: InputDecoration(labelText: "Write B option"),
+      decoration: InputDecoration(labelText: "B şıkkı"),
       controller: txtB,
     );
   }
 
   Widget buildTextC() {
     return TextField(
-      decoration: InputDecoration(labelText: "Write C option"),
+      decoration: InputDecoration(labelText: "C şıkkı"),
       controller: txtC,
     );
   }
 
   Widget buildTextD() {
     return TextField(
-      decoration: InputDecoration(labelText: "Write D option"),
+      decoration: InputDecoration(labelText: "D şıkkı"),
       controller: txtD,
     );
   }
 
-  Widget buildAnswer() {
-    return TextField(
-      decoration: InputDecoration(labelText: "Write Answer option"),
-      controller: txtAnswer,
+  buildAnswerDropDown(){
+    return DropdownButton<String>(
+      value: txtAnswer.text,
+      icon: const Icon(Icons.arrow_downward),
+      iconSize: 24,
+      elevation: 16,
+      style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String newValue) {
+        setState(() {
+          txtAnswer.text = newValue;
+        });
+      },
+      items: <String>['A', 'B', 'C', 'D']
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
     );
   }
 
   buildSaveButton(){
-    return RaisedButton(
-        child: Text("Update"),
+    return ElevatedButton(
+        child: Text("Güncelle"),
         onPressed: () async {
           var result =await DbHelper().update(Question.withId(question.id,txtQuestion.text,txtA.text,txtB.text,txtC.text,txtD.text,txtAnswer.text));
           Navigator.pop(context,true);

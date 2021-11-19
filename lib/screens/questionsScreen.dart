@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:learnquestions/data/dbHelper.dart';
-import 'package:learnquestions/models/question.dart';
-import 'package:learnquestions/screens/questionAddScreen.dart';
-import 'package:learnquestions/screens/questionDetail.dart';
+import 'package:sorularlaogren/data/dbHelper.dart';
+import 'package:sorularlaogren/models/question.dart';
+import 'package:sorularlaogren/screens/questionAddScreen.dart';
+import 'package:sorularlaogren/screens/questionDetail.dart';
 
 class QuestionScreen extends StatefulWidget{
   @override
@@ -17,22 +17,60 @@ class QuestionScreen extends StatefulWidget{
 class _QuestionScreen extends State{
   List<Question> questions;
   int allQuestionsCount=0;
+  var dbHelper=DbHelper();
+
   @override
   void initState() {
     getQuestions();
+    super.initState();
   }
+
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text("Questions Screen"),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [Text("Sorular"),ElevatedButton(onPressed: ()=>{showAlertDialog()}, child: Text("Tümünü Sil"))],),
       ),
       body: Column(children: <Widget>[
         buildQuestionList(),
         buildMenu()
       ],)
     );
+  }
+  void showAlertDialog(){
+    var alert = AlertDialog(
+      title: Text("tüm sorular silinecek"),
+      content: Text("emin misiniz?"),
+      actions: [
+        TextButton(
+            child: Text('Hayır'),
+            onPressed: () {
+              Navigator.pop(context);
+            }
+        ),
+        TextButton(
+            child: Text('Evet'),
+            onPressed: () {
+              clearQuestions();
+              Navigator.pop(context);
+            }
+        )
+      ],
+    );
+    showDialog(context: context, builder: (BuildContext context) => alert);
+  }
+
+
+  void clearQuestions(){
+    dbHelper.clearAll();
+    setState(() {
+      allQuestionsCount=0;
+    });
+
   }
 
   Widget buildQuestionList() {
@@ -66,7 +104,7 @@ class _QuestionScreen extends State{
             child:
     RaisedButton(
         color: Colors.green,
-        child: Text("Add"),
+        child: Text("Ekle"),
         onPressed: () async {
           bool result=await Navigator.push(context, MaterialPageRoute(builder: (context)=>QuestionAddScreen()));
           if(result!=null){

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "982957554183",
+    "project_id": "sorularlaogren-622d8",
+    "storage_bucket": "sorularlaogren-622d8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:982957554183:android:b0f71f491def2c335348a2",
+        "android_client_info": {
+          "package_name": "com.learn.sorularlaogren"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "982957554183-j1fug4utr6d34980arjbpc7rgp8ic98i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGDWSYErBatVI3l0tLXOkJi1w9oKPx6tM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "982957554183-j1fug4utr6d34980arjbpc7rgp8ic98i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

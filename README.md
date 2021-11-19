@@ -1,6 +1,6 @@
-# learnquestions
+# sorularlaogren
 
-A new Flutter application.
+kendi sorularınızı hazırlayın,o sorsun siz ögrenin
 
 ## Getting Started
 

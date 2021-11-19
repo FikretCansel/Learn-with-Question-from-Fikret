@@ -1,8 +1,13 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:learnquestions/data/dbHelper.dart';
-import 'package:learnquestions/models/question.dart';
+import 'package:sorularlaogren/data/dbHelper.dart';
+import 'package:sorularlaogren/models/Score.dart';
+import 'package:sorularlaogren/models/question.dart';
+import 'package:sorularlaogren/screens/answeredAllQuestions.dart';
+import 'package:sorularlaogren/services/advert-service.dart';
+import '../main.dart';
+
 
 class GameScreen extends StatefulWidget{
   @override
@@ -16,59 +21,107 @@ class _GameScreen extends State {
   List<Question> questions=[
     Question("Soru Yok", "", "", "", "", "")
   ];
-  int allQuestionsCount=0;
+  Score score=Score();
   int selectQuestionCount = 0;
   var aColor=Colors.green;
   var bColor=Colors.green;
   var cColor=Colors.green;
   var dColor=Colors.green;
-  bool isAnswed=false;
-  int scor=0;
+  bool isAnswer=false;
+  final AdvertService adverts=AdvertService();
+
   @override
   void initState() {
+    adverts.showBanner();
     getQuestions();
+    super.initState();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
       return Scaffold(
           backgroundColor: Colors.green,
-          body: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Column(
-                  children: [
-                    SizedBox(
-                      width: 150,
-                      height: 150,
-                    ),
+          body: SingleChildScrollView(
+            child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                    children: [
 
-                    Center(
-                      child: Text(questions[selectQuestionCount].question,
-                        style: TextStyle(color: Colors.white, fontSize: 20),),
-                    ),
-                    buildAoption(),
-                    buildBoption(),
-                    buildCoption(),
-                    buildDoption(),
-                    writeScor(),
-                    buildNextButton(),
-                  ]
-              )
+                      returnHomeMenu(),
+                      Center(
+                        child: Text(questions[selectQuestionCount].question,
+                          style: TextStyle(color: Colors.white, fontSize: 20),),
+                      ),
+                      buildAoption(),
+                      buildBoption(),
+                      buildCoption(),
+                      buildDoption(),
+                      writeScor(),
+                      buildNextButton(),
+
+                    ]
+                )
+            ),
           )
       );
   }
+
   void getQuestions() {
     var productsFuture = DbHelper().getProducts();
     productsFuture.then((data) {
       if(data.length!=0){
         setState(() {
           this.questions = data;
-          allQuestionsCount = data.length;
+          score.questionCount=data.length;
         });
       }
     });
   }
+  void showAlertDialog(){
+     var alert = AlertDialog(
+      title: Text("ilerleme silinecek."),
+      content: Text("Ana menüye dönmek istediginize emin misiniz?"),
+       actions: [
+     TextButton(
+      child: Text('Çık'),
+         onPressed: () {
+           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+      }
+     ),
+         TextButton(
+             child: Text('Kal'),
+             onPressed: () {
+              Navigator.pop(context);
+             }
+         )
+       ],
+    );
+    showDialog(context: context, builder: (BuildContext context) => alert);
+  }
 
+
+  Widget returnHomeMenu(){
+    return Container(
+      alignment: FractionalOffset.center,
+      child: new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          SizedBox(
+            width: 100,
+            height: 100,
+          ),
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green,),
+              onPressed: ()=>{
+                showAlertDialog()
+              }, child: IconButton(icon: Icon(Icons.home),))
+        ],
+      ),
+    );
+  }
 
   Widget buildAoption() {
     return
@@ -82,12 +135,12 @@ class _GameScreen extends State {
                   child: Text(questions[selectQuestionCount].a),
                   color: aColor,
                   onPressed: (){
-                    if(!isAnswed){
+                    if(!isAnswer){
                       setState(() {
-                        aColor=AnswerControl("A");
+                        aColor=answerControl("A");
                       });
                     }
-                    isAnswed=true;
+                    isAnswer=true;
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),
@@ -109,13 +162,13 @@ class _GameScreen extends State {
               child: Text(questions[selectQuestionCount].b),
               color: bColor,
               onPressed: (){
-                if(!isAnswed){
+                if(!isAnswer){
                   setState(() {
-                    bColor=AnswerControl("B");
+                    bColor=answerControl("B");
                   });
                 }
 
-                isAnswed=true;
+                isAnswer=true;
               },
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18.0),
@@ -136,12 +189,12 @@ class _GameScreen extends State {
               child: Text(questions[selectQuestionCount].c),
               color: cColor,
               onPressed: (){
-                if(!isAnswed){
+                if(!isAnswer){
                   setState(() {
-                    cColor=AnswerControl("C");
+                    cColor=answerControl("C");
                   });
                 }
-                isAnswed=true;
+                isAnswer=true;
               },
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18.0),
@@ -162,12 +215,12 @@ class _GameScreen extends State {
               child: Text(questions[selectQuestionCount].d),
               color: dColor,
               onPressed: (){
-                if(!isAnswed){
+                if(!isAnswer){
                   setState(() {
-                    dColor=AnswerControl("D");
+                    dColor=answerControl("D");
                   });
                 }
-                isAnswed=true;
+                isAnswer=true;
               },
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18.0),
@@ -179,35 +232,42 @@ class _GameScreen extends State {
   }
   buildNextButton() {
     return Visibility(
-      visible: isAnswed,
+      visible: isAnswer,
         child: RaisedButton(
         child: Text("Next"),
         color: Colors.blue,
         onPressed: (){
-          Random random = new Random();
-          selectQuestionCount = random.nextInt(allQuestionsCount);
-          setState(() {
-            questions;
-            aColor=Colors.green;
-            bColor=Colors.green;
-            cColor=Colors.green;
-            dColor=Colors.green;
-            scor;
-          });
-          isAnswed=false;
+          if(questions.length<=1){
+
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AnsweredAllQuestions(score)));
+          }
+          else {
+            questions.removeAt(selectQuestionCount);
+            Random random = new Random();
+            selectQuestionCount = random.nextInt(questions.length);
+            setState(() {
+              aColor = Colors.green;
+              bColor = Colors.green;
+              cColor = Colors.green;
+              dColor = Colors.green;
+            });
+            isAnswer = false;
+          }
         }));
   }
 
-   AnswerControl(String idOption) {
+   answerControl(String idOption) {
     if(idOption==questions[selectQuestionCount].answer){
-      scor++;
+      score.trueAnswerCount++;
       return Colors.blue;
     }
-    else return Colors.red;
+    else
+      score.falseAnswers.add(questions[selectQuestionCount]);
+      return Colors.red;
   }
 
   Widget writeScor() {
-    return Text("MyScor : "+scor.toString());
+    return Text("MyScor : "+score.trueAnswerCount.toString());
   }
 
   bool visibilityControl(String option) {
@@ -216,4 +276,10 @@ class _GameScreen extends State {
     }
     return false;
   }
+  void goToAnsweredAllQuestions(){
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AnsweredAllQuestions(score)));
+  }
+
+
+
 }
